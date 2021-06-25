@@ -1,0 +1,107 @@
+---
+title: "Who is more secure with their bodies: vegetarians or meat eaters?"
+author: "Nika Gorski"
+date: "6/24/2021"
+output: html_document
+bibliography: bibliography.bib
+---
+
+```{r, include=FALSE, echo = TRUE, eval = TRUE}
+# Basic knitr options
+library(knitr)
+opts_chunk$set(comment = NA, 
+               echo = TRUE, 
+               warning = FALSE, 
+               message = FALSE, 
+               error = TRUE)
+```
+
+```{r, echo = FALSE}
+library(gsheet)
+df <- gsheet2tbl('https://docs.google.com/spreadsheets/d/1GJwnFD0NG1r2NMVtDzL0r_p3MqvICJT4UkHmwDYcF8U/edit?usp=sharing')
+```
+
+# Introduction
+
+We are questioning whether your food lifestyle directly impacts how comfortable you feel in your own skin. It may be that vegetarians have a difference in their affective processing than meat eaters that could lead to a difference in how comfortable you are with your body [@Anderson2019]. What you eat is a part of your social identity, which is inherently a big part of who you are [@Nezlek2020]. Therefore, let us begin to figure out how you feel in your own skin.
+
+# Methods
+
+We have asked multiple individuals about their eating habits along with a few varying factors that could impact their confidence and comfortability with their bodies. We then analyzed the data and interpreted it to get our results.
+
+```{r, echo = FALSE}
+library(dplyr)
+names(df) <- c('Time', 'Sex', 'Age', 'Location', 'Meal', 'Comfort')
+
+df <- df %>%
+  mutate(Comfort = gsub('Change in the room #swiggityswoop', 
+                           'comfortable',
+                           Comfort))
+df <- df %>%
+  mutate(Comfort = gsub('Go to the bathroom to change #I<3privacy', 
+                           'not comfortable',
+                           Comfort))
+
+lifestyle <- df %>%
+  group_by(Meal, Comfort)%>%
+  tally
+
+others <- df %>% 
+  group_by(Comfort, Sex) %>%
+  tally
+
+eating <- df %>%
+  group_by(Sex, Meal) %>%
+  tally
+```
+# Results
+
+This is the sample of individuals that were surveyed and some characteristics about them along with more specified data.
+
+```{r, echo = FALSE}
+library(DT)
+DT::datatable(df %>% select(-Time))
+
+
+
+
+library(gapminder)
+library(ggplot2)
+ggplot(data = lifestyle,
+       aes(x = Comfort,
+           y = n,
+           fill = Meal)) +
+  geom_bar(stat = 'identity') +
+  labs(title = 'Meal Choice and the Relationship to Body Comfort',
+       x = 'Meal VS Comfort Level',
+       y = 'Number of People') 
+
+
+
+
+
+ggplot(data = others,
+       aes(x = Comfort,
+           y = n,
+           fill = Sex)) +
+  geom_bar(stat = 'identity') +
+  labs(title = 'Sex and the Relationship to Body Comfort',
+       x = 'Sex VS Comfort Level',
+       y = 'Number of People') 
+
+ggplot(data = eating,
+       aes(x = Sex,
+           y = n,
+           fill = Meal)) +
+  geom_bar(stat = 'identity') +
+  labs(title = 'Sex and Eating Habits',
+       x = 'Sex and Meal Choices',
+       y = 'Number of People') 
+
+```
+
+# Conclusion
+
+From the data you can see that people who eat everything seem to be more comfortable with their bodies than people who identify as vegetarians. It was thought that sex and place of birth may have an impact on people's comfortability with their bodies, which is why data on place of birth and sex were recorded. Place of birth proves to have no correlation, however sex may be a direct indicator of comfort level. More females are vegetarians than males, but more research is needed to confirm whether sex or diet is correlated to comfort level in one's own skin.
+
+## Bibliography
